@@ -121,17 +121,28 @@ function AddNewSession() {
     const [loading, setLoading] = useState(false);
     const [suggestedDoctors, setSuggestedDoctors] = useState<doctorAgent[]>();
     const [selectedDoctor, setSelectedDoctor] = useState<doctorAgent>();
+    const [error, setError] = useState<string>();
 
     const OnClickNext = async () => {
         setLoading(true);
+        setError(undefined);
         try {
             const result = await axios.post("/api/suggest-doctor", { notes: note });
             console.log("Doctors:", result.data);
             // Ensure result.data is an array
             const doctors = Array.isArray(result.data) ? result.data : [result.data];
             setSuggestedDoctors(doctors);
-        } catch (err) {
+        } catch (err: any) {
             console.error("Frontend error:", err);
+            if (err.response?.status === 401) {
+                setError("Authentication failed. Please check your API configuration.");
+            } else if (err.response?.status === 429) {
+                setError("Rate limit exceeded. Please try again later.");
+            } else if (err.response?.data?.error) {
+                setError(err.response.data.error);
+            } else {
+                setError("An error occurred while fetching doctors. Please try again.");
+            }
         }
         setLoading(false);
     };
@@ -172,6 +183,11 @@ function AddNewSession() {
                                     className="h-[200px] mt-1"
                                     onChange={(e) => setNote(e.target.value)}
                                 />
+                                {error && (
+                                    <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+                                        <p className="text-red-600 text-sm">{error}</p>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div>

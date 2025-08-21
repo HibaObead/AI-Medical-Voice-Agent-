@@ -13,10 +13,15 @@ export type props = {
     doctorAgent: doctorAgent
 }
 function DoctorAgentCard({ doctorAgent }: props) {
+    // Validate image and specialist properties
+    const imageSrc = doctorAgent?.image && doctorAgent.image.trim() !== '' ? doctorAgent.image : '/doctor1.png';
+    const altText = doctorAgent?.specialist && doctorAgent.specialist.trim() !== '' ? doctorAgent.specialist : 'Medical Specialist';
+
     return (
         <div>
             <Image
-                src={doctorAgent.image} alt={doctorAgent.specialist}
+                src={imageSrc}
+                alt={altText}
                 width={200} height={300}
                 className='w-full h-[250px] object-cover rounded-xl' />
             <h2 className='font-bold mt-1'>{doctorAgent.specialist}</h2>
