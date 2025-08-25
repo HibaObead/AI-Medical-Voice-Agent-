@@ -6,8 +6,9 @@ import { Circle, PhoneCall, PhoneOff, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Vapi from '@vapi-ai/web';
+import axios from 'axios';
 
-type sessionDetails = {
+export type sessionDetails = {
     id: number,
     notes: string,
     sessionId: string,
@@ -84,7 +85,35 @@ function MedicalVoiceAgent() {
             return;
         }
 
-        // Start voice conversation
+
+        // const VapiAgentConfig = {
+        //     name: 'AI Medical Doctor Voice Agent',
+        //     firstMessage: 'Hello, I am your AI medical assistant. How can I help you today?',
+        //     transcribter: {
+        //         provider: 'assembly-ai',
+        //         language: 'en'
+        //     },
+        //     voice: {
+        //         provider: '11labs',
+        //         voiceId: sessionDetails?.selectedDoctor.voiceId,
+        //     },
+        //     modle: {
+        //         provider: 'openai',
+        //         name: 'gpt-4',
+        //         messages: [
+        //             {
+        //                 role: 'system',
+        //                 content: sessionDetails?.selectedDoctor.agentPrompt,
+        //             }
+        //         ]
+        //     }
+        // }
+
+
+
+        // Start voice conversation'
+
+        //@ts-ignore
         vapi.start(process.env.NEXT_PUBLIC_VAPI_VOICE_ASSISTANT_ID);
         // Listen for events
         vapi.on('call-start', () => {
@@ -124,11 +153,39 @@ function MedicalVoiceAgent() {
 
     }
 
-    const EndCall = () => {
-        if (vapi) {
-            vapi.stop();
-            setCallStarted(false);
+    const EndCall = async () => {
+        setLoading(true);
+        try {
+            if (vapi) {
+                vapi.stop();
+                setCallStarted(false);
+
+                // Generate report when call ends
+                if (message.length > 0) {
+                    console.log('Generating medical report...');
+                    const result = await GenerateReport();
+                    console.log('Report generated:', result);
+                } else {
+                    console.log('No messages to generate report from');
+                }
+            }
+        } catch (error) {
+            console.error('Error ending call:', error);
+            setError(`Failed to end call: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        } finally {
+            setLoading(false);
         }
+    }
+
+    const GenerateReport = async () => {
+        //call api to generate report
+        const result = await axios.post('/api/medical-report', {
+            messages: message,
+            sessionDetails: sessionDetails,
+            sessionId: sessionId,
+        });
+        console.log(result.data);
+        return result.data;
     }
 
     if (loading) {
@@ -176,7 +233,13 @@ function MedicalVoiceAgent() {
 
             {sessionDetails &&
                 <div className='flex items-center mt-10 flex-col px-10 md:px-28 lg:px-52 xl:px-72'>
-                    <Image src={sessionDetails?.selectedDoctor?.image} alt={sessionDetails?.selectedDoctor?.specialist} width={120} height={120} className='h-[100px] w-[100px] object-cover rounded-full' />
+                    <Image
+                        src={sessionDetails?.selectedDoctor?.image && sessionDetails.selectedDoctor.image.trim() !== '' ? sessionDetails.selectedDoctor.image : '/doctor1.png'}
+                        alt={sessionDetails?.selectedDoctor?.specialist && sessionDetails.selectedDoctor.specialist.trim() !== '' ? sessionDetails.selectedDoctor.specialist : 'Medical Specialist'}
+                        width={120}
+                        height={120}
+                        className='h-[100px] w-[100px] object-cover rounded-full'
+                    />
                     <h2 className='mt-2 text-lg'>{sessionDetails?.selectedDoctor?.specialist} </h2>
                     <p className='text-sm text-gray-400'>AI Medical Voice Agent</p>
 

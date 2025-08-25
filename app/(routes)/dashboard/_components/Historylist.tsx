@@ -1,10 +1,25 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button';
 import AddNewSession from './AddNewSessionDialog';
+import axios from 'axios';
+import { sessionDetails } from '../medical-agent/[sessionId]/page';
+import HistoryTable from './HistoryTable';
+
 function Historylist() {
-    const [history, setHistory] = useState([]);
+    const [history, setHistory] = useState<sessionDetails[]>([]);
+    useEffect(() => {
+        GetHistoryList();
+    }, []);
+    const GetHistoryList = async () => {
+        const result = await axios.get('/api/session-chat?sessionId=all');
+        console.log(result.data);
+        setHistory(result.data);
+    }
+
+
+
     return (
         <div className='mt-10'>
             {history.length == 0 ?
@@ -15,7 +30,9 @@ function Historylist() {
                     <AddNewSession />
                 </div>
                 :
-                <div>List</div>
+                <div>
+                    <HistoryTable history={history} />
+                </div>
             }
         </div>
     )
