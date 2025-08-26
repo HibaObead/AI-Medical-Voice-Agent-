@@ -54,6 +54,7 @@ export default function Home() {
         >
           Deliverd instance access to medical assistance through natural voice conversations.
           Automate appointments schedualing,symptom triage, and follow up care 24/7.
+
         </motion.p>
 
         <Link href={'/sign-in'}>

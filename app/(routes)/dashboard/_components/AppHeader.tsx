@@ -13,7 +13,7 @@ const menuOptions = [
 function AppHeader() {
     return (
         <div className="flex justify-between items-center p-4 shadow px-10 md:px-20 lg:px-40">
-            <Image src="/logo.svg" alt="Logo" width={180} height={90} />
+            <Image src="/logo.png" alt="Logo" width={180} height={90} />
             <div className="hidden md:flex gap-12 items-center">
                 {menuOptions.map((option) => (
                     <Link
