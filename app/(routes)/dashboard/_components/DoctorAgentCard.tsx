@@ -30,7 +30,7 @@ function DoctorAgentCard({ doctorAgent }: props) {
     const { has } = useAuth();
     //@ts-ignore
     const paidUser = has && has({ plan: 'pro' });
-    console.log("Paid User Status:", paidUser);
+    // console.log("Paid User Status:", paidUser);
 
 
     const onStartConsultation = async () => {
