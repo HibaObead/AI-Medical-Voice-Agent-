@@ -5,7 +5,6 @@ import { FeaturesBentoGrid } from "./_components/FeaturesBentoGrid";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Brain } from "lucide-react";
 
 export default function Home() {
   return (
@@ -127,7 +126,9 @@ const Navbar = () => {
         </Link> :
         <div className="flex items-center gap-5">
           <UserButton />
-          <Button>Dashboard</Button>
+          <Link href="/dashboard">
+            <Button>Dashboard</Button>
+          </Link>
         </div>
       }
     </nav>
